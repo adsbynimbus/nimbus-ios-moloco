@@ -242,7 +242,7 @@ final class NimbusMolocoAdController: AdController,
     // MARK: - Rewarded delegate
     
     func userRewarded(ad: any MolocoAd) {
-        sendNimbusEvent(.completed)
+        sendNimbusEvent(.rewardEarned)
     }
     
     func rewardedVideoStarted(ad: any MolocoAd) {
