@@ -4,13 +4,13 @@ A Nimbus SDK extension for **Moloco bidding and rendering**. It enriches Nimbus 
 
 ## Versioning
 
-NimbusMolocoKit **major versions are kept in sync** with the Moloco SDK. For example, NimbusMolocoKit `3.x.x` depends on Moloco SDK `3.x.x`.
+NimbusMolocoKit **major versions are kept in sync** with the Moloco SDK. For example, NimbusMolocoKit `4.x.x` depends on Moloco SDK `4.x.x`.
  
 Minor and patch versions are independent — a NimbusMolocoKit patch release does not necessarily correspond to a Moloco SDK patch release, and vice versa.
  
 | NimbusMolocoKit | Moloco SDK |
 |---|---|
-| 3.x.x | 3.x.x |
+| 4.x.x | 4.x.x |
 
 ## Installation
 
@@ -23,7 +23,7 @@ Minor and patch versions are independent — a NimbusMolocoKit patch release doe
    ```
    https://github.com/adsbynimbus/nimbus-ios-moloco
    ```
-3. Set the dependency rule to **Up to Next Major Version** and enter `3.0.0` as the minimum.
+3. Set the dependency rule to **Up to Next Major Version** and enter `4.0.0` as the minimum.
 4. Click **Add Package** and select the **NimbusMolocoKit** library when prompted.
 
 #### Package.swift
@@ -32,7 +32,7 @@ If you're managing dependencies through a `Package.swift` file, add the followin
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/adsbynimbus/nimbus-ios-moloco", from: "3.0.0")
+    .package(url: "https://github.com/adsbynimbus/nimbus-ios-moloco", from: "4.0.0")
 ]
 ```
 
