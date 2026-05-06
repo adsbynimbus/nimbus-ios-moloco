@@ -121,7 +121,7 @@ final class NimbusMolocoAdController: AdController,
             adView.addSubview(bannerAd)
         } else if let nativeAd = nativeAd {
             guard let nativeAdViewProvider = MolocoExtension.nativeAdViewProvider else {
-                sendNimbusError(.moloco(reason: .misconfiguration, stage: .render, detail: "MolocoExtension.nativeAdViewProvider must be set to render native ads"))
+                sendNimbusError(.moloco(reason: .configuration, stage: .render, detail: "MolocoExtension.nativeAdViewProvider must be set to render native ads"))
                 return
             }
             
