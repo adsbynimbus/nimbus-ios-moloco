@@ -20,7 +20,7 @@ public protocol MolocoNativeAdViewType: UIView {
      It's recommended to implement this as a computed property, making
      it very easy to return the views you consider clickable, for instance:
      ```swift
-     class MyNativeView: UIView, NimbusMolocoNativeAdViewType {
+     class MyNativeView: UIView, MolocoNativeAdViewType {
         let mediaView: UIView
         let installButton: UIButton
         

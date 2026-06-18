@@ -26,7 +26,7 @@ struct NimbusMolocoInterceptorTests {
     }
     
     @Test func molocoBidTokenGetsInsertedIntoRequest() async throws {
-        var request = try await Nimbus.rewardedAd(position: "position").adRequest!.request
+        var request = await Nimbus.rewardedAd(position: "position").adRequest!.request
         request.interceptors = [interceptor]
         
         try await request.modifyRequestWithExtras(

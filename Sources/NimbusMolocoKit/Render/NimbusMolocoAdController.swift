@@ -9,11 +9,12 @@ import UIKit
 import NimbusKit
 import MolocoSDK
 
+// Internal: Do NOT implement delegate conformance as separate extensions as the methods will not be found in runtime when built as a static library
 final class NimbusMolocoAdController: AdController,
-                                      @preconcurrency MolocoBannerDelegate,
-                                      @preconcurrency MolocoInterstitialDelegate,
-                                      @preconcurrency MolocoNativeAdDelegate,
-                                      @preconcurrency MolocoRewardedDelegate {
+                                      @MainActor MolocoBannerDelegate,
+                                      @MainActor MolocoInterstitialDelegate,
+                                      @MainActor MolocoNativeAdDelegate,
+                                      @MainActor MolocoRewardedDelegate {
     
     // MARK: - Properties
     
@@ -262,5 +263,3 @@ extension NimbusMolocoAdController: UIGestureRecognizerDelegate {
         true
     }
 }
-
-// Internal: Do NOT implement delegate conformance as separate extensions as the methods won't not be found in runtime when built as a static library
