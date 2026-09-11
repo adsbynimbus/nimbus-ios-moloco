@@ -56,7 +56,6 @@ final class NimbusMolocoAdController: AdController,
         return adController
     }
     
-    @MainActor
     override func load() {
         guard let placementId = response.bid.ext?.omp?.buyerPlacementId else {
             sendNimbusError(.moloco(reason: .invalidState, stage: .render, detail: "Ad unit id is missing"))
@@ -112,7 +111,6 @@ final class NimbusMolocoAdController: AdController,
         }
     }
     
-    @MainActor
     func presentIfNeeded() {
         guard started, adState == .ready else { return }
         
@@ -176,9 +174,7 @@ final class NimbusMolocoAdController: AdController,
     }
     
     override func onStart() {
-        Task { @MainActor in
-            presentIfNeeded()
-        }
+        presentIfNeeded()
     }
     
     override func onDestroy() {
@@ -203,11 +199,9 @@ final class NimbusMolocoAdController: AdController,
     // MARK: - BaseAdDelegate
     
     func didLoad(ad: any MolocoAd) {
-        Task { @MainActor in
-            adState = .ready
-            sendNimbusEvent(.loaded)
-            presentIfNeeded()
-        }
+        adState = .ready
+        sendNimbusEvent(.loaded)
+        presentIfNeeded()
     }
     
     func failToLoad(ad: any MolocoAd, with error: (any Error)?) {

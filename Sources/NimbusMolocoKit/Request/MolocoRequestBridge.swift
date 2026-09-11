@@ -13,14 +13,14 @@ protocol MolocoRequestBridgeType: Sendable {
 }
 
 final class MolocoRequestBridge: MolocoRequestBridgeType {
-    public init() {}
+    init() {}
     
     @inlinable
-    public static func set(coppa: Bool) {
+    static func set(coppa: Bool) {
         MolocoPrivacySettings.isAgeRestrictedUser = coppa
     }
     
-    @concurrent public func bidToken() async throws -> String {
+    @concurrent func bidToken() async throws -> String {
         try await withUnsafeThrowingContinuation { continuation in
             Moloco.shared.getBidToken(params: .init(mediation: Nimbus.sdkName)) { bidToken, error in
                 guard let bidToken, error == nil else {
