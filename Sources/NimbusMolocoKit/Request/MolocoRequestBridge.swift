@@ -21,7 +21,7 @@ final class MolocoRequestBridge: MolocoRequestBridgeType {
     }
     
     @concurrent func bidToken() async throws -> String {
-        try await withUnsafeThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { continuation in
             Moloco.shared.getBidToken(params: .init(mediation: Nimbus.sdkName)) { bidToken, error in
                 guard let bidToken, error == nil else {
                     continuation.resume(throwing: NimbusError.moloco(
