@@ -11,11 +11,10 @@ import MolocoSDK
 
 // Internal: Do NOT implement delegate conformance as separate extensions as the methods will not be found in runtime when built as a static library
 final class NimbusMolocoAdController: AdController,
-                                      @MainActor MolocoBannerDelegate,
-                                      @MainActor MolocoInterstitialDelegate,
-                                      @MainActor MolocoNativeAdDelegate,
-                                      @MainActor MolocoRewardedDelegate {
-    
+                                      MolocoBannerDelegate,
+                                      MolocoInterstitialDelegate,
+                                      MolocoNativeAdDelegate,
+                                      MolocoRewardedDelegate {
     // MARK: - Properties
     
     // MARK: - Moloco ad types
@@ -66,16 +65,16 @@ final class NimbusMolocoAdController: AdController,
         
         switch adRenderType {
         case .banner:
-            guard let adPresentingViewController else {
+            guard let rootViewController = UIApplication.activeWindow?.rootViewController else {
                 sendNimbusError(.moloco(
                     reason: .invalidState,
                     stage: .render,
-                    detail: "adPresentingViewController was released before the ad was loaded")
+                    detail: "Could not detect root view controller")
                 )
                 return
             }
             
-            bannerAd = Moloco.shared.createBanner(params: adParams, viewController: adPresentingViewController)
+            bannerAd = Moloco.shared.createBanner(params: adParams, viewController: rootViewController)
             guard let bannerAd else {
                 sendNimbusError(.moloco(stage: .render, detail: "Moloco.shared.createBanner returned nil"))
                 return
@@ -198,53 +197,67 @@ final class NimbusMolocoAdController: AdController,
     
     // MARK: - BaseAdDelegate
     
-    func didLoad(ad: any MolocoAd) {
-        adState = .ready
-        sendNimbusEvent(.loaded)
-        presentIfNeeded()
+    nonisolated func didLoad(ad: any MolocoAd) {
+        runOnMainActor {
+            self.adState = .ready
+            self.sendNimbusEvent(.loaded)
+            self.presentIfNeeded()
+        }
     }
     
-    func failToLoad(ad: any MolocoAd, with error: (any Error)?) {
-        sendNimbusError(.moloco(stage: .render, detail: error?.localizedDescription))
+    nonisolated func failToLoad(ad: any MolocoAd, with error: (any Error)?) {
+        runOnMainActor {
+            self.sendNimbusError(.moloco(stage: .render, detail: error?.localizedDescription))
+        }
     }
     
-    func didShow(ad: any MolocoAd) {
-        sendNimbusEvent(.impression)
+    nonisolated func didShow(ad: any MolocoAd) {
+        runOnMainActor {
+            self.sendNimbusEvent(.impression)
+        }
     }
     
-    func failToShow(ad: any MolocoAd, with error: (any Error)?) {
-        sendNimbusError(.moloco(stage: .render, detail: error?.localizedDescription))
+    nonisolated func failToShow(ad: any MolocoAd, with error: (any Error)?) {
+        runOnMainActor {
+            self.sendNimbusError(.moloco(stage: .render, detail: error?.localizedDescription))
+        }
     }
     
-    func didHide(ad: any MolocoAd) {
-        destroy()
+    nonisolated func didHide(ad: any MolocoAd) {
+        runOnMainActor {
+            self.destroy()
+        }
     }
     
-    func didClick(on ad: any MolocoAd) {
-        sendNimbusEvent(.clicked)
+    nonisolated func didClick(on ad: any MolocoAd) {
+        runOnMainActor {
+            self.sendNimbusEvent(.clicked)
+        }
     }
     
     // MARK: - Native delegate
     
-    func didHandleClick(ad: any MolocoAd) {
+    nonisolated func didHandleClick(ad: any MolocoAd) {
         Nimbus.Log.ad.debug("Handled Moloco Click")
     }
     
-    func didHandleImpression(ad: any MolocoAd) {
+    nonisolated func didHandleImpression(ad: any MolocoAd) {
         Nimbus.Log.ad.debug("Handled Moloco Impression")
     }
     
     // MARK: - Rewarded delegate
     
-    func userRewarded(ad: any MolocoAd) {
-        sendNimbusEvent(.rewardEarned)
+    nonisolated func userRewarded(ad: any MolocoAd) {
+        runOnMainActor {
+            self.sendNimbusEvent(.rewardEarned)
+        }
     }
     
-    func rewardedVideoStarted(ad: any MolocoAd) {
+    nonisolated func rewardedVideoStarted(ad: any MolocoAd) {
         Nimbus.Log.ad.debug("Moloco Video Started")
     }
     
-    func rewardedVideoCompleted(ad: any MolocoAd) {
+    nonisolated func rewardedVideoCompleted(ad: any MolocoAd) {
         Nimbus.Log.ad.debug("Moloco Video Completed")
     }
 }
@@ -255,5 +268,33 @@ extension NimbusMolocoAdController: UIGestureRecognizerDelegate {
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
         true
+    }
+}
+
+// MARK: - Detect root view controller
+
+private extension UIScene.ActivationState {
+    var priority: Int {
+        switch self {
+        case .foregroundActive: 0
+        case .foregroundInactive: 1
+        case .background: 2
+        case .unattached: 3
+        @unknown default: 4
+        }
+    }
+}
+
+private extension UIApplication {
+    static var sortedWindowScenes: [UIWindowScene] {
+        shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .sorted { $0.activationState.priority < $1.activationState.priority }
+    }
+
+    static var activeWindow: UIWindow? {
+        let scenes = sortedWindowScenes
+        return scenes.lazy.compactMap(\.keyWindow).first
+            ?? scenes.lazy.compactMap(\.windows.first).first
     }
 }
