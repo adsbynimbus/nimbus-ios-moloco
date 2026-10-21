@@ -74,7 +74,11 @@ final class NimbusMolocoAdController: AdController,
                 return
             }
             
-            bannerAd = Moloco.shared.createBanner(params: adParams, viewController: rootViewController)
+            bannerAd = Moloco.shared.createMolocoBanner(
+                params: adParams,
+                size: .from(size: response.bid.size),
+                viewController: rootViewController
+            )
             guard let bannerAd else {
                 sendNimbusError(.moloco(stage: .render, detail: "Moloco.shared.createBanner returned nil"))
                 return
