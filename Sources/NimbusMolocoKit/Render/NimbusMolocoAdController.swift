@@ -86,32 +86,51 @@ final class NimbusMolocoAdController: AdController,
             bannerAd.delegate = self
             bannerAd.load(bidResponse: response.bid.adm)
         case .interstitial:
-            interstitialAd = Moloco.shared.createInterstitial(params: adParams)
-            guard let interstitialAd else {
+            guard let interstitialAd = Moloco.shared.createInterstitial(params: adParams) else {
                 sendNimbusError(.moloco(stage: .render, detail: "Moloco.shared.createInterstitial returned nil"))
                 return
             }
-            interstitialAd.interstitialDelegate = self
-            interstitialAd.load(bidResponse: response.bid.adm)
+            buildInterstitialAd(interstitialAd).load(bidResponse: response.bid.adm)
         case .native:
-            nativeAd = Moloco.shared.createNativeAd(params: adParams)
-            guard let nativeAd else {
+            guard let nativeAd = Moloco.shared.createNativeAd(params: adParams) else {
                 sendNimbusError(.moloco(stage: .render, detail: "Moloco.shared.createNative returned nil"))
                 return
             }
-            nativeAd.delegate = self
-            nativeAd.load(bidResponse: response.bid.adm)
+            buildNativeAd(nativeAd).load(bidResponse: response.bid.adm)
         case .rewarded:
-            rewardedAd = Moloco.shared.createRewarded(params: adParams)
-            guard let rewardedAd else {
+            guard let rewardedAd = Moloco.shared.createRewarded(params: adParams) else {
                 sendNimbusError(.moloco(stage: .render, detail: "Moloco.shared.createRewarded returned nil"))
                 return
             }
-            rewardedAd.rewardedDelegate = self
-            rewardedAd.load(bidResponse: response.bid.adm)
+            buildRewardedAd(rewardedAd).load(bidResponse: response.bid.adm)
         @unknown default:
             sendNimbusError(.moloco(reason: .unsupported, stage: .render, detail: "adRenderType: \(adRenderType.rawValue)"))
         }
+    }
+    
+    // MARK: - Builders (store the Moloco ad and wire its delegate, without loading)
+    // Moloco creates its ads itself through `Moloco.shared`, so these take the created ad.
+    // Banners aren't included: Moloco only creates them once its SDK is initialized, so tests can't get one.
+    
+    @discardableResult
+    func buildInterstitialAd(_ interstitialAd: any MolocoInterstitial) -> any MolocoInterstitial {
+        interstitialAd.interstitialDelegate = self
+        self.interstitialAd = interstitialAd
+        return interstitialAd
+    }
+    
+    @discardableResult
+    func buildNativeAd(_ nativeAd: any MolocoNativeAd) -> any MolocoNativeAd {
+        nativeAd.delegate = self
+        self.nativeAd = nativeAd
+        return nativeAd
+    }
+    
+    @discardableResult
+    func buildRewardedAd(_ rewardedAd: any MolocoRewardedInterstitial) -> any MolocoRewardedInterstitial {
+        rewardedAd.rewardedDelegate = self
+        self.rewardedAd = rewardedAd
+        return rewardedAd
     }
     
     func presentIfNeeded() {
@@ -216,9 +235,7 @@ final class NimbusMolocoAdController: AdController,
     }
     
     nonisolated func didShow(ad: any MolocoAd) {
-        runOnMainActor {
-            self.sendNimbusEvent(.impression)
-        }
+        runOnMainActor { self.sendNimbusEvent(.impression) }
     }
     
     nonisolated func failToShow(ad: any MolocoAd, with error: (any Error)?) {
@@ -228,15 +245,11 @@ final class NimbusMolocoAdController: AdController,
     }
     
     nonisolated func didHide(ad: any MolocoAd) {
-        runOnMainActor {
-            self.destroy()
-        }
+        runOnMainActor { self.destroy() }
     }
     
     nonisolated func didClick(on ad: any MolocoAd) {
-        runOnMainActor {
-            self.sendNimbusEvent(.clicked)
-        }
+        runOnMainActor { self.sendNimbusEvent(.clicked) }
     }
     
     // MARK: - Native delegate
@@ -252,9 +265,7 @@ final class NimbusMolocoAdController: AdController,
     // MARK: - Rewarded delegate
     
     nonisolated func userRewarded(ad: any MolocoAd) {
-        runOnMainActor {
-            self.sendNimbusEvent(.rewardEarned)
-        }
+        runOnMainActor { self.sendNimbusEvent(.rewardEarned) }
     }
     
     nonisolated func rewardedVideoStarted(ad: any MolocoAd) {
@@ -262,7 +273,7 @@ final class NimbusMolocoAdController: AdController,
     }
     
     nonisolated func rewardedVideoCompleted(ad: any MolocoAd) {
-        Nimbus.Log.ad.debug("Moloco Video Completed")
+        runOnMainActor { self.sendNimbusEvent(.completed) }
     }
 }
 
