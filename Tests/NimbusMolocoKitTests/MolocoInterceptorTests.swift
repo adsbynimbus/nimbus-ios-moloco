@@ -1,5 +1,5 @@
 //
-//  NimbusMolocoInterceptorTests.swift
+//  MolocoRequestInterceptorTests.swift
 //  Nimbus
 //  Created on 6/2/25
 //  Copyright © 2025 Nimbus Advertising Solutions Inc. All rights reserved.
@@ -11,9 +11,9 @@ import MolocoSDK
 import Testing
 
 @Suite("Moloco request interceptor tests")
-struct NimbusMolocoInterceptorTests {
+struct MolocoRequestInterceptorTests {
     
-    let interceptor = NimbusMolocoRequestInterceptor(bridge: MockMolocoRequestBridge())
+    let interceptor = MolocoRequestInterceptor(bridge: MockMolocoRequestBridge())
     
     @Test func bidTokenAndRenderInfoGetsSet() async throws {
         let info = try NimbusRequest(from: await Nimbus.bannerAd(position: "test", size: .banner).adRequest!.request)

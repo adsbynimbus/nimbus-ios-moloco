@@ -287,7 +287,7 @@ struct MolocoAdControllerTests {
     // MARK: - Load validation
 
     @Test func loadFailsWithoutAdUnit() {
-        let adController = NimbusMolocoAdController(
+        let adController = MolocoAdController(
             response: NimbusResponse(id: "", bid: .init(mtype: .static, adm: "", price: 0, ext: .init())),
             isBlocking: true,
             isRewarded: false,
@@ -320,14 +320,14 @@ struct MolocoAdControllerTests {
 
     enum Format { case banner, native, interstitial, rewarded }
 
-    private func makeAdController(_ format: Format) -> (NimbusMolocoAdController, MockDelegate) {
+    private func makeAdController(_ format: Format) -> (MolocoAdController, MockDelegate) {
         let mtype: NimbusResponse.Bid.MarkupType = switch format {
         case .banner, .interstitial: .static
         case .native: .native
         case .rewarded: .video
         }
 
-        let adController = NimbusMolocoAdController(
+        let adController = MolocoAdController(
             response: NimbusResponse(id: "", bid: .init(
                 mtype: mtype,
                 adm: "test-bid-response",

@@ -1,5 +1,5 @@
 //
-//  NimbusMolocoAdController.swift
+//  MolocoAdController.swift
 //  Nimbus
 //  Created on 5/28/25
 //  Copyright © 2025 Nimbus Advertising Solutions Inc. All rights reserved.
@@ -10,11 +10,12 @@ import NimbusKit
 import MolocoSDK
 
 // Internal: Do NOT implement delegate conformance as separate extensions as the methods will not be found in runtime when built as a static library
-final class NimbusMolocoAdController: AdController,
-                                      MolocoBannerDelegate,
-                                      MolocoInterstitialDelegate,
-                                      MolocoNativeAdDelegate,
-                                      MolocoRewardedDelegate {
+final class MolocoAdController: AdController,
+                                UIGestureRecognizerDelegate,
+                                MolocoBannerDelegate,
+                                MolocoInterstitialDelegate,
+                                MolocoNativeAdDelegate,
+                                MolocoRewardedDelegate {
     // MARK: - Properties
     
     // MARK: - Moloco ad types
@@ -275,9 +276,9 @@ final class NimbusMolocoAdController: AdController,
     nonisolated func rewardedVideoCompleted(ad: any MolocoAd) {
         runOnMainActor { self.sendNimbusEvent(.completed) }
     }
-}
-
-extension NimbusMolocoAdController: UIGestureRecognizerDelegate {
+    
+    // MARK: - UIGestureRecognizerDelegate
+    
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer

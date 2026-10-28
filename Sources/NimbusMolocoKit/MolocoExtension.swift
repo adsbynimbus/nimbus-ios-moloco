@@ -29,7 +29,7 @@ public struct MolocoExtension: NimbusRequestExtension, NimbusRenderExtension {
     public var network: String { "molocosdk" }
     
     @_documentation(visibility: internal)
-    public var controllerType: AdController.Type { NimbusMolocoAdController.self }
+    public var controllerType: AdController.Type { MolocoAdController.self }
     
     /// Creates a Moloco extension.
     ///
@@ -42,7 +42,7 @@ public struct MolocoExtension: NimbusRequestExtension, NimbusRenderExtension {
     /// }
     /// ```
     public init(appKey: String? = nil) {
-        self.interceptor = NimbusMolocoRequestInterceptor()
+        self.interceptor = MolocoRequestInterceptor()
         
         guard let appKey, !Moloco.shared.isInitialized else {
             Nimbus.Log.lifecycle.debug("Skipping Moloco SDK initialization, appKey was not provided or SDK is already initialized")

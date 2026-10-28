@@ -1,5 +1,5 @@
 //
-//  NimbusMolocoNativeAdViewType.swift
+//  MolocoNativeAdViewType.swift
 //  Nimbus
 //  Created on 7/7/25
 //  Copyright © 2025 Nimbus Advertising Solutions Inc. All rights reserved.
