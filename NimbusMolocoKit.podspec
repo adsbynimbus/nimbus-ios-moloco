@@ -18,5 +18,5 @@ Pod::Spec.new do |spec|
     }
 
     spec.dependency 'NimbusSDK/NimbusKit', '~> 3'
-    spec.dependency 'MolocoSDKiOS', '~> 4'
+    spec.dependency 'MolocoSDKiOS', '~> 4.4'
 end
